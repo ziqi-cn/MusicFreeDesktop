@@ -1,7 +1,7 @@
 import { asyncCacheFn } from "@/common/cache-fn";
 import axios from "axios";
 import fs from "fs/promises";
-import sharp from "sharp";
+// import sharp from "sharp";
 import { getResPath } from "./get-res-path";
 
 const getDefaultAlbumBuffer = asyncCacheFn(async () => {
@@ -42,25 +42,25 @@ export default async function (src: string, hwnd: bigint) {
 
     const size = 106;
 
-    const result = await sharp(buffer)
-      .resize(size, size, {
-        fit: "cover",
-      })
-      .png()
-      .ensureAlpha(1)
-      .raw()
-      .toBuffer({
-        resolveWithObject: true,
-      });
+    // const result = await sharp(buffer)
+    //   .resize(size, size, {
+    //     fit: "cover",
+    //   })
+    //   .png()
+    //   .ensureAlpha(1)
+    //   .raw()
+    //   .toBuffer({
+    //     resolveWithObject: true,
+    //   });
 
-    TaskbarThumbnailManager.sendIconicRepresentation(
-      hwnd,
-      {
-        width: size,
-        height: size,
-      },
-      result.data
-    );
+    // TaskbarThumbnailManager.sendIconicRepresentation(
+    //   hwnd,
+    //   {
+    //     width: size,
+    //     height: size,
+    //   },
+    //   result.data
+    // );
   } catch {
     console.error("Not Support");
   }

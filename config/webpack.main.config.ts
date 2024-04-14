@@ -25,6 +25,5 @@ export const mainConfig: Configuration = {
   },
   output: {
     filename: "[name].js",
-  },
-  externals: ['sharp']
+  }
 };

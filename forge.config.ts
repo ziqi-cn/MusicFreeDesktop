@@ -79,7 +79,6 @@ const config: ForgeConfig = {
     {
       name: '@timfish/forge-externals-plugin',
       config: {
-        externals: ['sharp'],
         includeDeps: true
       }
     }
