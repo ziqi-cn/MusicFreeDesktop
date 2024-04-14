@@ -166,33 +166,38 @@ function callPluginMethod({
   return result;
 }
 
-/** 加载所有插件 */
-export async function loadAllPlugins() {
-  const pluginBasePath = getPluginBasePath();
-  const rawPluginNames = await fs.readdir(pluginBasePath);
-  const pluginHashSet = new Set<string>();
-  const _plugins: Plugin[] = [];
-  for (let i = 0; i < rawPluginNames.length; ++i) {
+/** 加载指定路径下的插件 */
+async function loadPluginsFromPath(pluginPath: string, plugins: Plugin[], pluginHashSet: Set<string>) {
+  const rawPluginNames = await fs.readdir(pluginPath);
+  for (const rawPluginName of rawPluginNames) {
     try {
-      const pluginPath = path.resolve(pluginBasePath, rawPluginNames[i]);
-      const filestat = await fs.stat(pluginPath);
-      if (filestat.isFile() && path.extname(pluginPath) === ".js") {
-        const funcCode = await fs.readFile(pluginPath, "utf-8");
-        const plugin = new Plugin(funcCode, pluginPath);
-        if (pluginHashSet.has(plugin.hash)) {
-          continue;
-        }
-        if (plugin.hash !== "") {
+      const pluginPathResolved = path.resolve(pluginPath, rawPluginName);
+      const filestat = await fs.stat(pluginPathResolved);
+      if (filestat.isFile() && path.extname(pluginPathResolved) === ".js") {
+        const funcCode = await fs.readFile(pluginPathResolved, "utf-8");
+        const plugin = new Plugin(funcCode, pluginPathResolved);
+        if (!pluginHashSet.has(plugin.hash) && plugin.hash !== "") {
           pluginHashSet.add(plugin.hash);
-          _plugins.push(plugin);
+          plugins.push(plugin);
         }
       }
     } catch (e) {
       console.log(e);
     }
   }
-  setPlugins(_plugins);
+}
 
+/** 加载所有插件 */
+export async function loadAllPlugins() {
+  const pluginAppPath = path.join(app.getAppPath(), 'plugins');
+  const pluginUserPath = getPluginBasePath();
+  const _plugins: Plugin[] = [];
+  const pluginHashSet = new Set<string>();
+
+  await loadPluginsFromPath(pluginUserPath, _plugins, pluginHashSet);
+  await loadPluginsFromPath(pluginAppPath, _plugins, pluginHashSet);
+  
+  setPlugins(_plugins);
   sendPlugins();
 }
 
